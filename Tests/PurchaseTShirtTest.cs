@@ -25,7 +25,7 @@ public class PurchaseTShirtTest
         _playwright = await Playwright.CreateAsync();
         _browser = await _playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
         {
-            Headless = false // показываем окно
+            Headless = false 
         });
         _context = await _browser.NewContextAsync(new BrowserNewContextOptions
         {
@@ -45,41 +45,34 @@ public class PurchaseTShirtTest
     [Test]
     public async Task Buy_SauceLabs_Bolt_TShirt_EndToEnd()
     {
-        // Login
+        
         await _page.GotoAsync(BaseUrl);
         await _page.Locator("[data-test='username']").FillAsync(Username);
         await _page.Locator("[data-test='password']").FillAsync(Password);
         await _page.GetByRole(AriaRole.Button, new() { Name = "Login" }).ClickAsync();
         await _page.WaitForURLAsync(new Regex("inventory.html"));
-
-        // Open item by name
+        
         var itemName = "Sauce Labs Bolt T-Shirt";
         await _page.Locator("[data-test='inventory-item-name']").Filter(new() { HasTextString = itemName }).ClickAsync();
 
-        // Add to cart on product page
         await _page.Locator("[data-test='add-to-cart']").ClickAsync();
         await _page.ScreenshotAsync(new PageScreenshotOptions { Path = "TestResults/added-to-cart.png", FullPage = true });
 
-        // Go to cart
         await _page.Locator("[data-test='shopping-cart-link']").ClickAsync();
         await _page.WaitForURLAsync(new Regex("cart.html"));
 
-        // Checkout
         await _page.Locator("[data-test='checkout']").ClickAsync();
         await _page.WaitForURLAsync(new Regex("checkout-step-one.html"));
 
-        // Fill user data
         await _page.Locator("[data-test='firstName']").FillAsync("Eldars");
         await _page.Locator("[data-test='lastName']").FillAsync("Veromejs");
         await _page.Locator("[data-test='postalCode']").FillAsync("LV-1005");
 
-        // Continue
         await _page.Locator("[data-test='continue']").ClickAsync();
         await _page.WaitForURLAsync(new Regex("checkout-step-two.html"));
     
         await _page.ScreenshotAsync(new PageScreenshotOptions { Path = "TestResults/before-finish.png", FullPage = true });
 
-        // Finish
         await _page.Locator("[data-test='finish']").ClickAsync();
         await _page.WaitForURLAsync(new Regex("checkout-complete.html"));
 
