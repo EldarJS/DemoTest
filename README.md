@@ -1,29 +1,21 @@
-# DemoProject (C# + Playwright + NUnit)
+# DemoProject (Automated Web Test with C# & Playwright)
 
-## Что делает
-- **LoginTest**: логинится и проверяет, что попали на inventory.
-- **PurchaseTShirtTest**: логинится, открывает товар *Sauce Labs Bolt T-Shirt*, добавляет в корзину, оформляет заказ с данными `Eldars Veromejs, LV-1005` и делает скриншоты.
+This project demonstrates an end-to-end automated UI test built with C#, NUnit, and Microsoft Playwright.
 
-## Запуск
-1. Установи .NET 8 SDK.
-2. В терминале перейди в папку проекта:
-   ```powershell
-   cd "<ПУТЬ>/DemoProject"
-   ```
-3. Установи Playwright CLI и браузеры (хватает Chromium):
-   ```powershell
-   dotnet tool install --global Microsoft.Playwright.CLI
-   playwright install
-   ```
-4. (Опционально) задать логин/пароль:
-   ```powershell
-   $env:SAUCE_USERNAME="standard_user"
-   $env:SAUCE_PASSWORD="secret_sauce"
-   ```
-5. Запуск тестов:
-   ```powershell
-   dotnet restore
-   dotnet test
-   ```
+## The test suite covers:
 
-Скрины лежат в `TestResults/`.
+- **LoginTest**: Login to SauceDemo with configurable credentials (via environment variables or default demo user).
+- **PurchaseTShirtTest**: Purchase flow for the product "Sauce Labs Bolt T-Shirt": 
+1. Navigate to the product
+2. Add to cart
+3. Proceed to checkout
+4. Fill in customer details
+5. Complete the order
+## Technologies used
+1. .NET 8
+
+2. NUnit (unit test framework)
+
+3. Microsoft Playwright (browser automation)
+
+Visual artifacts: screenshots taken at key steps are saved to the TestResults folder.
