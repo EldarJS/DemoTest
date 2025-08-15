@@ -1,0 +1,58 @@
+name: Playwright C# Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_username:
+        description: "SauceDemo username"
+        required: false
+      run_password:
+        description: "SauceDemo password"
+        required: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Install Playwright Browsers
+        run: |
+          dotnet tool install --global Microsoft.Playwright.CLI
+          playwright install --with-deps
+
+      - name: Set credentials (inputs override secrets)
+        run: |
+          echo "SAUCE_USERNAME=${{ github.event.inputs.run_username != '' && github.event.inputs.run_username || secrets.SAUCE_USERNAME }}" >> $GITHUB_ENV
+          echo "SAUCE_PASSWORD=${{ github.event.inputs.run_password != '' && github.event.inputs.run_password || secrets.SAUCE_PASSWORD }}" >> $GITHUB_ENV
+
+      - name: Run tests (headless in CI)
+        env:
+          SAUCE_USERNAME: ${{ env.SAUCE_USERNAME }}
+          SAUCE_PASSWORD: ${{ env.SAUCE_PASSWORD }}
+          CI: "true"
+        run: |
+          dotnet test --logger "trx;LogFileName=test_results.trx"
+
+      - name: Upload TestResults
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: TestResults
+          path: |
+            TestResults/**/*.png
+            **/TestResults/**/*.png
+            **/TestResults/**/*.mp4
+            **/TestResults/**/*.zip
+            **/*.trx
+          if-no-files-found: ignore
