@@ -23,6 +23,7 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
+ 
       - name: Locate project
         id: locate
         shell: bash
@@ -39,12 +40,22 @@ jobs:
       - name: Restore
         run: dotnet restore "${{ env.PROJECT_FILE }}"
 
+
+      - name: Build
+        run: dotnet build "${{ env.PROJECT_FILE }}" --configuration Release
+
+      - name: Install Playwright CLI
+        run: dotnet tool install --global Microsoft.Playwright.CLI
+
+
       - name: Install Playwright Browsers
         run: |
-          dotnet tool install --global Microsoft.Playwright.CLI
-          # важно запускать установку из папки проекта
-          (cd "${{ env.PROJECT_DIR }}" && playwright install --with-deps)
+          cd "${{ env.PROJECT_DIR }}"
+          playwright install --with-deps
+          # если нужно только Chromium:
+          # playwright install chromium
 
+ 
       - name: Set credentials (inputs override secrets)
         run: |
           echo "SAUCE_USERNAME=${{ github.event.inputs.run_username != '' && github.event.inputs.run_username || secrets.SAUCE_USERNAME }}" >> $GITHUB_ENV
