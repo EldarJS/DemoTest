@@ -1,35 +1,34 @@
-name: Playwright C# Test
+name: Playwright C# Tests
 
 on:
   workflow_dispatch:
     inputs:
       run_username:
-        description: "SauceDemo username"
+        description: "SauceDemo username (optional; overrides secret)"
         required: false
       run_password:
-        description: "SauceDemo password"
+        description: "SauceDemo password (optional; overrides secret)"
         required: false
 
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
 
       - name: Restore
         run: dotnet restore
+        working-directory: DemoProject
 
       - name: Install Playwright Browsers
         run: |
           dotnet tool install --global Microsoft.Playwright.CLI
           playwright install --with-deps
+        working-directory: DemoProject
 
       - name: Set credentials (inputs override secrets)
         run: |
@@ -41,8 +40,8 @@ jobs:
           SAUCE_USERNAME: ${{ env.SAUCE_USERNAME }}
           SAUCE_PASSWORD: ${{ env.SAUCE_PASSWORD }}
           CI: "true"
-        run: |
-          dotnet test --logger "trx;LogFileName=test_results.trx"
+        run: dotnet test --logger "trx;LogFileName=test_results.trx"
+        working-directory: DemoProject
 
       - name: Upload TestResults
         if: always()
@@ -50,9 +49,7 @@ jobs:
         with:
           name: TestResults
           path: |
-            TestResults/**/*.png
-            **/TestResults/**/*.png
-            **/TestResults/**/*.mp4
-            **/TestResults/**/*.zip
-            **/*.trx
+            DemoProject/TestResults/**/*.png
+            DemoProject/**/TestResults/**/*.png
+            DemoProject/**/*.trx
           if-no-files-found: ignore
