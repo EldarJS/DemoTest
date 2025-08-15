@@ -13,22 +13,37 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-dotnet@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
 
+      - name: Locate project
+        id: locate
+        shell: bash
+        run: |
+          set -e
+          PROJECT_FILE="$(git ls-files '*.csproj' | head -n 1)"
+          if [ -z "$PROJECT_FILE" ]; then
+            echo "No .csproj found!"; exit 1
+          fi
+          echo "Found project: $PROJECT_FILE"
+          echo "PROJECT_FILE=$PROJECT_FILE" >> $GITHUB_ENV
+          echo "PROJECT_DIR=$(dirname "$PROJECT_FILE")" >> $GITHUB_ENV
+
       - name: Restore
-        run: dotnet restore
-        working-directory: DemoProject
+        run: dotnet restore "${{ env.PROJECT_FILE }}"
 
       - name: Install Playwright Browsers
         run: |
           dotnet tool install --global Microsoft.Playwright.CLI
-          playwright install --with-deps
-        working-directory: DemoProject
+          # важно запускать установку из папки проекта
+          (cd "${{ env.PROJECT_DIR }}" && playwright install --with-deps)
 
       - name: Set credentials (inputs override secrets)
         run: |
@@ -40,8 +55,7 @@ jobs:
           SAUCE_USERNAME: ${{ env.SAUCE_USERNAME }}
           SAUCE_PASSWORD: ${{ env.SAUCE_PASSWORD }}
           CI: "true"
-        run: dotnet test --logger "trx;LogFileName=test_results.trx"
-        working-directory: DemoProject
+        run: dotnet test "${{ env.PROJECT_FILE }}" --logger "trx;LogFileName=test_results.trx"
 
       - name: Upload TestResults
         if: always()
@@ -49,7 +63,8 @@ jobs:
         with:
           name: TestResults
           path: |
-            DemoProject/TestResults/**/*.png
-            DemoProject/**/TestResults/**/*.png
-            DemoProject/**/*.trx
+            ${{ env.PROJECT_DIR }}/TestResults/**/*.png
+            ${{ env.PROJECT_DIR }}/**/TestResults/**/*.png
+            ${{ env.PROJECT_DIR }}/*.trx
+            ${{ env.PROJECT_DIR }}/**/*.trx
           if-no-files-found: ignore
