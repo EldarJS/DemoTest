@@ -37,5 +37,5 @@ Tests use environment variables for DemoProject login:
 - SAUCE_PASSWORD;
 ## FYI
 - In GitHub Actions, they run in headless mode;
-- If you want to see the test execution, change Headless => false to true;
+- If you want to see the test execution, change Headless => from **true** to **false**;
 - In GitHub Actions, credentials are securely stored as repository secrets;
