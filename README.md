@@ -2,20 +2,40 @@
 
 This project demonstrates an end-to-end automated UI test built with C#, NUnit, and Microsoft Playwright.
 
-## The test suite covers:
-
-- **LoginTest**: Login to SauceDemo with configurable credentials (via environment variables or default demo user).
-- **PurchaseTShirtTest**: Purchase flow for the product "Sauce Labs Bolt T-Shirt": 
-1. Navigate to the product
-2. Add to cart
-3. Proceed to checkout
-4. Fill in customer details
-5. Complete the order
-## Technologies used
-1. .NET 8
-
-2. NUnit (unit test framework)
-
-3. Microsoft Playwright (browser automation)
-
-Visual artifacts: screenshots taken at key steps are saved to the TestResults folder.
+## About
+This project is an automated test suite written in **C#** with **Playwright** and **NUnit**.  
+It was created as a test assignment and automates the purchase flow on the (https://www.saucedemo.com/) application:
+- Login with valid credentials,
+- Navigate to the **Sauce Labs Bolt T-Shirt**,
+- Add the item to the shopping cart,
+- Proceed to checkout,
+- Fill in customer details,
+- Complete the order,
+- Take a screenshot of the confirmation page;
+## Tech Stack
+- [.NET 8](https://dotnet.microsoft.com/),
+- [Playwright for .NET](https://playwright.dev/dotnet/docs/intro),
+- [NUnit](https://nunit.org/),
+- GitHub Actions for CI/CD;
+## Installation & Run (locally)
+1. Clone the repo:
+- git clone;
+- cd;
+2. Install dependencies:
+- dotnet restore;
+3. Install Playwright browsers:
+- dotnet build;
+- dotnet add package Microsoft.Playwright;
+- dotnet add package Microsoft.Playwright.NUnit;
+- dotnet tool install --global Microsoft.Playwright.CLI;
+- playwright install;
+5. Run tests:
+- dotnet test;
+## Credentials
+Tests use environment variables for DemoProject login:
+- SAUCE_USERNAME;
+- SAUCE_PASSWORD;
+## FYI
+- In GitHub Actions, they run in headless mode;
+- If you want to see the test execution, change Headless => false to true;
+- In GitHub Actions, credentials are securely stored as repository secrets;
